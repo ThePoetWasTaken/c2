@@ -1,0 +1,38 @@
+WARNINGS := -Wall -Wextra -Wpedantic -Werror -std=c11 -Wno-unused-parameter -march=r3000 -mfp32
+INCLUDE := -Iinclude
+
+DEBUG_FLAGS := -ggdb3 -O0
+RELEASE_FLAGS := -Os -ffunction-sections -fdata-sections
+
+SRC := $(wildcard src/*.c)
+OBJ := $(patsubst src/%.c,build/%.o,$(SRC))
+
+TARGET := build/c2
+
+.PHONY: all debug release clean
+
+all: release
+
+run: release
+	@clear
+	./$(TARGET)
+
+debug: clean
+debug: CFLAGS := $(WARNINGS) $(DEBUG_FLAGS) $(INCLUDE)
+debug: LDFLAGS :=
+debug: $(TARGET)
+
+release: clean
+release: CFLAGS := $(WARNINGS) $(RELEASE_FLAGS) $(INCLUDE)
+release: LDFLAGS := -Wl,--gc-sections -s
+release: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS)
+
+build/%.o: src/%.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -rf build
