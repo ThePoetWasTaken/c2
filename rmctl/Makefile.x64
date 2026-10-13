@@ -1,0 +1,38 @@
+CC := gcc
+
+WARNINGS := -Wall -Wextra -Wpedantic -Werror -std=c23 -static -Wno-unused-parameter 
+INCLUDE := -Iinclude
+
+DEBUG_FLAGS := -g -O0
+RELEASE_FLAGS := -O2
+
+SRC := $(wildcard src/*.c)
+OBJ := $(patsubst src/%.c,build/%.o,$(SRC))
+
+TARGET := build/rmctl
+
+.PHONY: all debug release clean
+
+all: release
+
+run: release
+	@clear
+	./$(TARGET)
+
+debug: clean
+debug: CFLAGS := $(WARNINGS) $(DEBUG_FLAGS) $(INCLUDE)
+debug: $(TARGET)
+
+release: clean
+release: CFLAGS := $(WARNINGS) $(RELEASE_FLAGS) $(INCLUDE)
+release: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CC) $(OBJ) -o $@
+
+build/%.o: src/%.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -rf build

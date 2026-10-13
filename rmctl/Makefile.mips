@@ -1,5 +1,7 @@
-WARNINGS := -Wall -Wextra -Wpedantic -Werror -std=c11 -Wno-unused-parameter -march=r3000 -mfp32
-INCLUDE := -Iinclude
+PROJECT_DIR := $(shell pwd)
+
+WARNINGS := -Wall -Wextra -Wpedantic -Werror -std=c11 -Wno-unused-parameter -march=mips32 -mfp32 
+INCLUDE := -I$(PROJECT_DIR)/include -I$(PROJECT_DIR)/../include
 
 DEBUG_FLAGS := -ggdb3 -O0
 RELEASE_FLAGS := -Os -ffunction-sections -fdata-sections
@@ -7,7 +9,7 @@ RELEASE_FLAGS := -Os -ffunction-sections -fdata-sections
 SRC := $(wildcard src/*.c)
 OBJ := $(patsubst src/%.c,build/%.o,$(SRC))
 
-TARGET := build/c2
+TARGET := build/rmctl
 
 .PHONY: all debug release clean
 

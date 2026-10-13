@@ -1,7 +1,7 @@
 #!/bin/bash
 
-./dockcross make $1
+./dockcross make $2 -C $1
 
-file ./build/c2
+file $1/build/$1
 
-qemu-mips ./build/c2
+qemu-mips -strace "$1/build/$1" < /dev/null

@@ -1,15 +1,15 @@
-CC := gcc
+PROJECT_DIR := $(shell pwd)
 
-WARNINGS := -Wall -Wextra -Wpedantic -Werror -std=c23 -static -Wno-unused-parameter 
-INCLUDE := -Iinclude
+WARNINGS := -march=mips32 -mfp32 -nostdlib -static -Wl,--gc-sections -s
+INCLUDE := -I$(PROJECT_DIR)/include -I$(PROJECT_DIR)/../include
 
-DEBUG_FLAGS := -g -O0
-RELEASE_FLAGS := -O2
+DEBUG_FLAGS := -ggdb3 -O0
+RELEASE_FLAGS := -Os -ffunction-sections -fdata-sections
 
-SRC := $(wildcard src/*.c)
+SRC := $(wildcard src/*.c) $(wildcard src/*.S)
 OBJ := $(patsubst src/%.c,build/%.o,$(SRC))
 
-TARGET := build/c2
+TARGET := build/preamp
 
 .PHONY: all debug release clean
 
@@ -21,14 +21,17 @@ run: release
 
 debug: clean
 debug: CFLAGS := $(WARNINGS) $(DEBUG_FLAGS) $(INCLUDE)
+debug: LDFLAGS :=
 debug: $(TARGET)
 
 release: clean
 release: CFLAGS := $(WARNINGS) $(RELEASE_FLAGS) $(INCLUDE)
+release: LDFLAGS :=
 release: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $@
+	@mkdir -p build
+	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS)
 
 build/%.o: src/%.c
 	@mkdir -p build
